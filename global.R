@@ -30,3 +30,4 @@ l.colors <- c("red", "navy", "green", "yellow", "turquoise", "tan", "orange",
               "purple", "darkslategrey", "steelblue", "pink")
 pal <- colorFactor(l.colors, domain = dt.crimes.map$Type.Highlight)
 
+
