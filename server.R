@@ -45,17 +45,6 @@ function(input, output, session) {
   
   
   # ---- Data Explorer ----
-  # -- About the Crimino Dataset Tab--
-  output$variables <- DT:: renderDT({
-    dt.variables
-  })
-
-  output$sample <- DT:: renderDT({
-    dt.crimes %>% 
-      dplyr::sample_n(100)
-  })
-  
-  
   # -- Summary Statistics Tab
   output$tb.descriptives <- renderTable({
     dt.descriptives <- data.frame(Category = c("Total nº of observations", "Unique crime types", "Unique crime groups - Primary.Type", "Total nº unique locations", "Arrests"), Statistics = c(nrow(dt.crimes), length(unique(dt.crimes$Description)), length(unique(dt.crimes$Primary.Type)), length(unique(dt.crimes$Location)), nrow(dt.crimes[Arrest == "Yes", ])))
@@ -373,10 +362,45 @@ function(input, output, session) {
   output$centralitysummary <- renderTable({
     graphCentralities()
   })
-
-  patch-4
   
   # ---- Advanced Analytics ----
+  
+  output$regression.data <- DT::renderDT({
+    dt.regression.data <- round(dt.ward, 2)
+    DT::datatable(
+      dt.regression.data,
+      filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+      options = list(#scrollY = 650,
+                     scrollX = 500,
+                     deferRender = TRUE,
+                     scroller = TRUE,
+                     paging = TRUE,
+                     pageLength = 10,
+                     buttons = list('excel',
+                                    list(extend = 'colvis', targets = 0, visible = FALSE)),
+                     dom = 'lBfrtip',
+                     fixedColumns = list(leftColumns = 1)), 
+      rownames = FALSE)
+  })
+  
+  output$regression.coefficients <- DT::renderDT({
+    dt.regression.coefficients <- dt.regression.est
+    dt.regression.coefficients <- dt.regression.coefficients %>% mutate_if(is.numeric, round, digits = 2)
+    DT::datatable(
+      dt.regression.coefficients,
+      filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+      options = list(#scrollY = 650,
+                     scrollX = 500,
+                     deferRender = TRUE,
+                     scroller = TRUE,
+                     paging = TRUE,
+                     pageLength = 10,
+                     buttons = list('excel',
+                                    list(extend = 'colvis', targets = 0, visible = FALSE)),
+                     dom = 'lBfrtip',
+                     fixedColumns = list(leftColumns = 1)), 
+      rownames = FALSE)
+  })
   
   predictions <- reactive({
     dt.output.prediction <- data.table(matrix(ncol = 2, nrow = 1))
@@ -437,10 +461,8 @@ function(input, output, session) {
     dt.all.predictions
   })
   
-  output$predictions <- renderTable({
+  output$predictions <- DT::renderDT({
     predictions()
   })  
   
-=======
- main
 }
