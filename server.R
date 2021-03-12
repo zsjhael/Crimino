@@ -45,6 +45,17 @@ function(input, output, session) {
   
   
   # ---- Data Explorer ----
+  # -- About the Crimino Dataset Tab--
+  output$variables <- DT:: renderDT({
+    dt.variables
+  })
+
+  output$sample <- DT:: renderDT({
+    dt.crimes %>% 
+      dplyr::sample_n(100)
+  })
+  
+  
   # -- Summary Statistics Tab
   output$tb.descriptives <- renderTable({
     dt.descriptives <- data.frame(Category = c("Total nº of observations", "Unique crime types", "Unique crime groups - Primary.Type", "Total nº unique locations", "Arrests"), Statistics = c(nrow(dt.crimes), length(unique(dt.crimes$Description)), length(unique(dt.crimes$Primary.Type)), length(unique(dt.crimes$Location)), nrow(dt.crimes[Arrest == "Yes", ])))
@@ -362,6 +373,8 @@ function(input, output, session) {
   output$centralitysummary <- renderTable({
     graphCentralities()
   })
+
+  patch-4
   
   # ---- Advanced Analytics ----
   
@@ -428,4 +441,6 @@ function(input, output, session) {
     predictions()
   })  
   
+=======
+ main
 }
