@@ -10,12 +10,11 @@ navbarPage("Crimino", collapsible = TRUE, inverse = TRUE, theme = "bootstrap.css
                            tabPanel("Platform", 
                                      br(),
                             p("Crimino is a platform which aims to shed light on patterns of crime in the city of Chicago. 
-By making use of a dataset extracted from the Chicago Police department for the year 2020, this platform offers you the possibility to view and analyze criminal data in different formats."),
+By making use of a dataset extracted from the Chicago Police department for the year 2017, this platform offers you the possibility to view and analyze criminal data in different formats."),
 
 p("The general aim of Crimino is to expose patterns that could not previously be seen by the naked eye and help law enforcement distinguish connections between crime type, location and time."),
 
-p("In addition to the overview provided in Data explorer and Interactive map, Crimino provides an advanced analysis via link prediction to try and predict crime cooccurrence.
-Finally, Crimino provides a node similarity analysis to spot similarities across the wards of Chicago in terms of crime type and demographics.")),
+p("In addition to the overview provided in Data explorer and Interactive map, Crimino provides an advanced analysis to try and predict crime cooccurrence based on various user inputs.")),
                                  tabPanel("Relevance",
                                           br(),
                                           p(" One of the drawbacks of having separate law enforcement entities dedicated to distinct locations is that sometimes, one can lose sight of the overall picture. 
@@ -26,37 +25,27 @@ Finally, Crimino provides a node similarity analysis to spot similarities across
                                             p("Having this overview, gives authorities the opportunity to devise efficient measures of crime control and proactively fight it.")),
                                             
                         
-                            tabPanel("Team",
+                          tabPanel("Team",
                                      br(),
                                      p("Meet the team behind Crimino! A team of students of Business Information Management at RSM who aim to help you explore the crime network in Chicago."),
                                      br(),
-                                     fluidRow(
-                                       column(3, 
-img(src = "Klea.png", height = 100, width = 100),
-img(src = "Wesley.png", height = 100, width = 100),
-img(src = "Maria.png", height = 100, width = 100),
-img(src = "Jelle.png", height = 100, width = 100)),
+img(src = "Klea.png", height = 100, width = 200),
+p("<b>","Klea Gjana","</b>"),
+p("Business Information student"),
 
-column(4, 
-p("Klea Gjana"),
-p("BIM student"),
-br(),
-br(),
-br(),
-p("Wesley Kruijthof"),
-p("BIM student"),
-br(),
-br(),
-br(),
-p("Maria Peres de Melo"),
-p("BIM student"),
-br(),
-br(),
-br(),
-p("Jelle van der Grijn"),
-p("BIM student"))
+img(src = "Wesley.png", height = 100, width = 200),
+p("<b>","Wesley Kruijthof","</b>"),
+p("Business Information student"),
+
+img(src = "Maria.png", height = 100, width = 200),
+p("<b>","Maria Pere de Melo","</b>"),
+p("Business Information student"),
+
+img(src = "Jelle.png", height = 100, width = 200),
+p("<b>","Jelle van der Grijn","</b>"),
+p("Business Information student")
                           
-                        ))))),
+                        )))),
            ),
            
            tabPanel("Data Explorer",
@@ -99,7 +88,7 @@ p("BIM student"))
                                      sidebarPanel(
                                                 h4("Explore the Crimino Dataset"),
                                                 p("Here you can find overall descriptives on the crime in Chicago in 2017. There are in total 254 different types of crimes happening accross 50 wards. 
-                                                       In total, there are around 30.000 crime cases in more that 28.000 different specific locations"),
+                                                       In total, there are around 40.000 crime cases in more than 30.000 different specific locations"),
                                               br(),
                                        tableOutput("tb.descriptives")
                                      ),
@@ -148,7 +137,9 @@ p("BIM student"))
                                    mainPanel(
                                      tabsetPanel(
                                        tabPanel('Overview', 
-                                                {DT::DTOutput('summarytable')}),
+                                                {DT::DTOutput('summarytable')},
+                                                br(),
+                                       {DT:DTOutput('demotable')}),
                                        tabPanel('Chart',
                                                 {plotOutput('hist')})
                                      ))))
