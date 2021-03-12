@@ -3,7 +3,8 @@ navbarPage("Crimino", collapsible = TRUE, inverse = TRUE, theme = "bootstrap.css
                     sidebarLayout(
                       sidebarPanel = sidebarPanel(h1("Welcome to Crimino!"),
                                                   h5("Connecting the dots of Chicago's crime patterns."),
-                                                  img(src = "Chicago.bean.png", height = 200, width = 200, align = "center")),
+                                                  HTML('<center><img src="Chicago.bean.png" height="200" width="200"></center>'),
+                      ),
                       mainPanel = mainPanel(
                         tabsetPanel(
                            tabPanel("Platform", 
@@ -248,7 +249,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    through the networ analytic analysis and how 
                                    this analysis will be used to predict crime 
                                    occurence on the next page."),
+
+                                 hr(),
+
                                  br(),
+
                                  h3("1. Approach"),
                                  p("In order to predict the overall occurrence of
                                    different crime types by each Chicago Ward,
@@ -273,7 +278,12 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                  p("A schematic overview of our multilayered network 
                                    is given below. The network is based weighted 
                                    Crime Type--Ward network and extended by:"),
+
+                                 tags$ol(
+                                   tags$li(strong("Ward demographics.")," Information on demographics 
+
                                  p("1. Ward demographics. Information on demographics 
+
                                    by ward from the US Census, more specifically, 
                                    the distribution of Race ('% White', '% Black' 
                                    & '% Asian'), the percentage of people with 
@@ -281,7 +291,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    of each working inhabitant. This is not specfically 
                                    network data and will therefore not show up in 
                                    the visualisation."),
+
+                                   tags$li(strong("311 Service Call Requests."), " The number of 
+
                                  p("2. 311 Service Call Requests. The number of 
+
                                    requests made to the municipality on the following 
                                    topics: notifications of Abandoned Vehicles, 
                                    requests for new Garbage Carts for household waste, 
@@ -292,7 +306,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    have its own node and the edge with Ward will be 
                                    weighted based on the number of requests made within 
                                    the boudaries of that ward."),
+
+                                   tags$li(strong("Police Stations."), " In Chicago, police stations 
+
                                  p("3. Police Stations. In Chicago, police stations 
+
                                    are assigned to police districts, so that almost 
                                    all districs have one police station in them. 
                                    However, Wards do not fit within certain police 
@@ -304,7 +322,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    to the same stations. We will include the number 
                                    of edges (number of connected stations) in the 
                                    regression analysis."),
+
+                                   tags$li(strong("Geographic Neigbors."), " Wards are connected to 
+
                                  p("4. Geographic Neigbors. Wards are connected to 
+
                                    each other if they share a geographic border. 
                                    In order to include the influence of a broader 
                                    area around the Ward on the occurrence of crimes, 
@@ -318,6 +340,84 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    in the regression. Thus, each variable will occur 
                                    twice, once for the Ward in question and once as 
                                    the average of the neighbors of the Ward in question."),
+
+                                 ),
+                                 p("Now, based on this network data we will run 
+                                   a linear regression, which will be futher elaborated 
+                                   on below. Hereafter, we will provide a schematic 
+                                   representation of the network and a plot of the 
+                                   actual network. For clarity, we did not plot the 
+                                   edge weights in the visualisation."),
+                                 HTML('<center><img src="Schematic_Network.jpg" height="250" width="375"></center>'),
+                                 h1(strong("[INCLUDE NETWORK VISUALISATION]")),
+                                 h3("3. Regression Analysis"),
+                                 p("Now we have a the network in place, we can perform 
+                                   a linear regression using the number of crimes 
+                                   by each primary type for each ward and, as 
+                                   regression predictors, the network edges for 
+                                   each ward and ward demographics. This will lead 
+                                   to the following regression model: "),
+                                 HTML('<center><img src="Regression_Model.jpg" height="147" width="490"></center>'),
+                                 p("We have estimated the regression model and will 
+                                   present the results below. Then we will use the 
+                                   regression coeffiecients for each crime type to 
+                                   predict crime levels on the next page. There you 
+                                   will be able to tweak the variable inputs of your 
+                                   Ward to see the effects of, for example, increasing 
+                                   average income levels in that ward, or buidling 
+                                   and additional police station. Keep in mind that 
+                                   you will be tweaking the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change. Lastly, 
+                                   we will provide a sneak peak of what the data looks like 
+                                   that is used in the regression analysis."),
+                                 DT::DTOutput('regression.coefficients'),
+                                 hr(),
+                                 h3("Data Sneak Peak"),
+                                 p("To restrict the number of columns in the table, 
+                                 we have only included the vvalues of the varibales 
+                                   that the model will be regressed on."),
+                                 DT::DTOutput('regression.data'),
+                        ),
+                        tabPanel("Crime Prediction",
+                                 titlePanel("Predicting Spatio Crime Occurrence"),
+                                 p("Whether crime rates are high or low, it is always 
+                                   preferable to decrease crime rates, but what 
+                                   effects of your interventions are is quite hard 
+                                   to find out. Luckily, using Crimino, you can 
+                                   predict the crime rate of your Ward, based on 
+                                   tweaks you make to the characteristics of your 
+                                   Ward. Below, you can tweak the input values of 
+                                   your Ward and see what the predicted number of 
+                                   crimes will be for that Ward, based on the new 
+                                   situation. Keep in mind that you will be tweaking
+                                   the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change."),
+                                 p("Keep in mind that you will be tweaking the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change."),
+                                 hr(),
+                                 useShinyjs(),
+                                 h3("1. Choose Default Ward Values"),
+                                 p("Choose a Ward you would like to optimize. You 
+                                   can edit the individual Ward characteristics 
+                                   below, but note that the average neigbor values 
+                                   of this ward will be taken into account for 
+                                   calculating the predicted crimes."),
+                                 fluidRow(
+                                   box(
+                                     width = 4, solidHeader = TRUE, status = "primary",
+                                     sliderInput(inputId = 'ward.input', label = 'Select original ward', min = 1, max = 50, value = 24),
+                                   ),
+                                 ),
+                                 hr(),
+                                 h3("2. Adjust Inputs"),
+                                 p("Adjust the inputs for your ward."),
+
                                  p("Now, ... bla bla bla"),
                                  p("[INCLUDE SCHEMATIC OVERVIEW], [INCLUDE NETWORK VISUALISATION]"),
                                  br(),
@@ -340,6 +440,7 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                  ),
                                  br(),
                                  h3("2. Adjust Inputs"),
+
                                  fluidRow(
                                    shinydashboard::box(
                                      title = "Demographics", width = 4, solidHeader = TRUE, status = "primary",
@@ -358,8 +459,24 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                      uiOutput("police.input"),
                                    ),
                                  ),
+
+                                 hr(),
+                                 h3("Prediction of number of crimes"),
+                                 p("The table below will show the predicted crime 
+                                   rates for each crime type, based on your inputs 
+                                   above. A negative predicted value of crimes 
+                                   will show in the table as no crimes expected. 
+                                   Some crime type only occur very rarely and 
+                                   not even in each Ward, hence the potential for 
+                                   negative values. As the negativity of the rate 
+                                   will only indicate the likelihood that a crime 
+                                   will not occur, it should be fine to show them 
+                                   as zero for this exercise"),
+                                 DT::DTOutput('predictions')
+
                                  h3("Prediction of number of crimes"),
                                  tableOutput("predictions")
+
                         )
                       )
                     )
