@@ -47,7 +47,7 @@ p("BIM student"),
 br(),
 br(),
 br(),
-p("Maria Pelos Melo"),
+p("Maria Peres de Melo"),
 p("BIM student"),
 br(),
 br(),
@@ -70,6 +70,7 @@ p("BIM student"))
                                    sidebarLayout(
                                      
                                      sidebarPanel(
+                                                h4("Explore the Crimino Dataset"),
                                                 p("Here you can find overall descriptives on the crime in Chicago in 2017. There are in total 254 different types of crimes happening accross 50 wards. 
                                                        In total, there are around 30.000 crime cases in more that 28.000 different specific locations"),
                                               br(),
@@ -78,11 +79,14 @@ p("BIM student"))
                                      
                                      mainPanel (
                                        tabsetPanel(
-                                         tabPanel("Wards", plotOutput("hist.ward")),
-                                         tabPanel("Crimes", plotOutput("hist.Primary.Type")),
-                                         tabPanel("Crime Descriptions", plotOutput("hist.Description"))
+                                         tabPanel("Wards", h3("Frequency of Crimes per Ward"),plotOutput("hist.ward")),
+                                         tabPanel("Crime Types",h3("Frequency of Crime Types"), plotOutput("hist.Primary.Type")),
+                                         tabPanel("Top 10 Crimes", h3("Top 10 Crimes - Daily and Hourly Occurrence"), tableOutput("df.top.10.crimes"))
                                        ),
-                                       tableOutput("tb.locations")
+                                      
+                                        hr(),
+                                         h3("Data descriptives per type of Location"),
+                                         tableOutput("tb.locations"),
                                      )
                                    )
                                  )
