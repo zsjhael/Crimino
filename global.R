@@ -12,6 +12,7 @@ library(threejs)
 library(bslib)
 library(shinydashboard)
 library(shinyjs)
+library(DT)
 
 #rsconnect::setAccountInfo(name='crimino', token='189602F95F6264E8E5E9AF9DFD5DE1D8', secret='Usyjx5HUgHab5yHNx5zJkeDiyiEvB4ti8TuLyTiY')
 #deployApp(appName = "Crimino")
