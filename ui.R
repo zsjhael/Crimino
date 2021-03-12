@@ -3,7 +3,8 @@ navbarPage("Crimino", collapsible = TRUE, inverse = TRUE, theme = "bootstrap.css
                     sidebarLayout(
                       sidebarPanel = sidebarPanel(h1("Welcome to Crimino!"),
                                                   h5("Connecting the dots of Chicago's crime patterns."),
-                                                  img(src = "Chicago.bean.png", height = 200, width = 200, align = "center")),
+                                                  HTML('<center><img src="Chicago.bean.png" height="200" width="200"></center>'),
+                      ),
                       mainPanel = mainPanel(
                         tabsetPanel(
                            tabPanel("Platform", 
@@ -199,8 +200,205 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                  
                       )))), 
            tabPanel("Advanced Analytics",
-                    titlePanel("Predicting Crime Occurrence"),
+                    h1("Advanced Analytics: Crime Optimization"),
                     br(),
-                    p("Through our predictive analysis of the crime dataset you can receive information about whether a certain crime station is likely to happen in a specific ward given that two wards are connected."),
+                    p("Now you know what the data looks like, you might be interested 
+                      in improving the crime rates of your ward. Using this tool, 
+                      you can tweak some of the network values of a Ward of your 
+                      interest and see what effect this might have on the number 
+                      of crimes of a certain type in your Ward. This will allow you to see 
+                      what you need to improve about your Ward of interest in order 
+                      to lower the number of crimes of a specific type."),
+                    fluidPage(
+                      tabsetPanel(
+                        tabPanel("How To Guide",
+                                 titlePanel("How To Predict Crime Occurence"),
+                                 p("This page serves as an explanation of what happens 
+                                   on the next page and what your possibilities are 
+                                   for optimizing your ward. Below, we will run you 
+                                   through the networ analytic analysis and how 
+                                   this analysis will be used to predict crime 
+                                   occurence on the next page."),
+                                 hr(),
+                                 h3("1. Approach"),
+                                 p("In order to predict the overall occurrence of
+                                   different crime types by each Chicago Ward,
+                                   we will build a 
+                                   multilayerd network, that is based on the Crime 
+                                   Type--Ward weighted network and exteded with 
+                                   data on Police Stations, 311 Service Calls 
+                                   (citizen complaints to the municipality about 
+                                   a topic in their area), geographic neighbors and 
+                                   demographics.
+                                   Next, we will regress the edge weight of each edge 
+                                   in the weighted Crime Type--Ward network (crime 
+                                   occurrence by Ward by Primary Type) on the other 
+                                   edges connected to each Ward, thus repeating 
+                                   the regression for each crime type, based on the 
+                                   data of the 50 wards. Then, we use the 
+                                   regression coefficients of all variables by 
+                                   each crime type to estimate the total number of 
+                                   crimes in a year based on interactively tweaked 
+                                   predictor values."),
+                                 h3("2. Build the Network"),
+                                 p("A schematic overview of our multilayered network 
+                                   is given below. The network is based weighted 
+                                   Crime Type--Ward network and extended by:"),
+                                 tags$ol(
+                                   tags$li(strong("Ward demographics.")," Information on demographics 
+                                   by ward from the US Census, more specifically, 
+                                   the distribution of Race ('% White', '% Black' 
+                                   & '% Asian'), the percentage of people with 
+                                   Hispanic ethnicity and the average income level 
+                                   of each working inhabitant. This is not specfically 
+                                   network data and will therefore not show up in 
+                                   the visualisation."),
+                                   tags$li(strong("311 Service Call Requests."), " The number of 
+                                   requests made to the municipality on the following 
+                                   topics: notifications of Abandoned Vehicles, 
+                                   requests for new Garbage Carts for household waste, 
+                                   Rodent Baiting and rat complaints, Sanitation 
+                                   Code Complaints (litter on the street), requests 
+                                   for Graffiti Removal and notifications of 
+                                   Abandoned Buildings. Each of these topics will 
+                                   have its own node and the edge with Ward will be 
+                                   weighted based on the number of requests made within 
+                                   the boudaries of that ward."),
+                                   tags$li(strong("Police Stations."), " In Chicago, police stations 
+                                   are assigned to police districts, so that almost 
+                                   all districs have one police station in them. 
+                                   However, Wards do not fit within certain police 
+                                   districts and will therefore be connected to a 
+                                   police station if it has geographic overlap with 
+                                   a district that contains a police station. Hence, 
+                                   some wards are connected to 1 station, others to 7 
+                                   and, as this is a network, Ward could be connected 
+                                   to the same stations. We will include the number 
+                                   of edges (number of connected stations) in the 
+                                   regression analysis."),
+                                   tags$li(strong("Geographic Neigbors."), " Wards are connected to 
+                                   each other if they share a geographic border. 
+                                   In order to include the influence of a broader 
+                                   area around the Ward on the occurrence of crimes, 
+                                   we include the average values 
+                                   of all previously mentioned variables of the 
+                                   neighbors of a specific ward in the geospatial 
+                                   network. For example, if Ward 2 shares a border 
+                                   with only Ward 4 and 17, we include the average 
+                                   values of the demographics, 311 Service Requests 
+                                   and Police Stations of Ward 4 and 17 as predictors 
+                                   in the regression. Thus, each variable will occur 
+                                   twice, once for the Ward in question and once as 
+                                   the average of the neighbors of the Ward in question."),
+                                 ),
+                                 p("Now, based on this network data we will run 
+                                   a linear regression, which will be futher elaborated 
+                                   on below. Hereafter, we will provide a schematic 
+                                   representation of the network and a plot of the 
+                                   actual network. For clarity, we did not plot the 
+                                   edge weights in the visualisation."),
+                                 HTML('<center><img src="Schematic_Network.jpg" height="250" width="375"></center>'),
+                                 h1(strong("[INCLUDE NETWORK VISUALISATION]")),
+                                 h3("3. Regression Analysis"),
+                                 p("Now we have a the network in place, we can perform 
+                                   a linear regression using the number of crimes 
+                                   by each primary type for each ward and, as 
+                                   regression predictors, the network edges for 
+                                   each ward and ward demographics. This will lead 
+                                   to the following regression model: "),
+                                 HTML('<center><img src="Regression_Model.jpg" height="147" width="490"></center>'),
+                                 p("We have estimated the regression model and will 
+                                   present the results below. Then we will use the 
+                                   regression coeffiecients for each crime type to 
+                                   predict crime levels on the next page. There you 
+                                   will be able to tweak the variable inputs of your 
+                                   Ward to see the effects of, for example, increasing 
+                                   average income levels in that ward, or buidling 
+                                   and additional police station. Keep in mind that 
+                                   you will be tweaking the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change. Lastly, 
+                                   we will provide a sneak peak of what the data looks like 
+                                   that is used in the regression analysis."),
+                                 DT::DTOutput('regression.coefficients'),
+                                 hr(),
+                                 h3("Data Sneak Peak"),
+                                 p("To restrict the number of columns in the table, 
+                                 we have only included the vvalues of the varibales 
+                                   that the model will be regressed on."),
+                                 DT::DTOutput('regression.data'),
+                        ),
+                        tabPanel("Crime Prediction",
+                                 titlePanel("Predicting Spatio Crime Occurrence"),
+                                 p("Whether crime rates are high or low, it is always 
+                                   preferable to decrease crime rates, but what 
+                                   effects of your interventions are is quite hard 
+                                   to find out. Luckily, using Crimino, you can 
+                                   predict the crime rate of your Ward, based on 
+                                   tweaks you make to the characteristics of your 
+                                   Ward. Below, you can tweak the input values of 
+                                   your Ward and see what the predicted number of 
+                                   crimes will be for that Ward, based on the new 
+                                   situation. Keep in mind that you will be tweaking
+                                   the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change."),
+                                 p("Keep in mind that you will be tweaking the default values of your 
+                                   Ward of interest and that the situation in the 
+                                   neighboring Wards stay the same. Thus, the values 
+                                   for the neighbor variables shall not change."),
+                                 hr(),
+                                 useShinyjs(),
+                                 h3("1. Choose Default Ward Values"),
+                                 p("Choose a Ward you would like to optimize. You 
+                                   can edit the individual Ward characteristics 
+                                   below, but note that the average neigbor values 
+                                   of this ward will be taken into account for 
+                                   calculating the predicted crimes."),
+                                 fluidRow(
+                                   box(
+                                     width = 4, solidHeader = TRUE, status = "primary",
+                                     sliderInput(inputId = 'ward.input', label = 'Select original ward', min = 1, max = 50, value = 24),
+                                   ),
+                                 ),
+                                 hr(),
+                                 h3("2. Adjust Inputs"),
+                                 p("Adjust the inputs for your ward."),
+                                 fluidRow(
+                                   shinydashboard::box(
+                                     title = "Demographics", width = 4, solidHeader = TRUE, status = "primary",
+                                     uiOutput("income.input"),
+                                     uiOutput("race.white.input"),
+                                     uiOutput("race.black.input"),
+                                     uiOutput("race.asian.input"),
+                                     uiOutput("ethnicity.input"),
+                                   ),
+                                   box(
+                                     title = "Nº of 311 Service Calls", width = 4, solidHeader = TRUE, status = "primary",
+                                     uiOutput("service.calls.input"),
+                                   ),
+                                   box(
+                                     title = "Nº of Police Stations", width = 4, solidHeader = TRUE, status = "primary",
+                                     uiOutput("police.input"),
+                                   ),
+                                 ),
+                                 hr(),
+                                 h3("Prediction of number of crimes"),
+                                 p("The table below will show the predicted crime 
+                                   rates for each crime type, based on your inputs 
+                                   above. A negative predicted value of crimes 
+                                   will show in the table as no crimes expected. 
+                                   Some crime type only occur very rarely and 
+                                   not even in each Ward, hence the potential for 
+                                   negative values. As the negativity of the rate 
+                                   will only indicate the likelihood that a crime 
+                                   will not occur, it should be fine to show them 
+                                   as zero for this exercise"),
+                                 DT::DTOutput('predictions')
+                        )
+                      )
+                    )
 )
 )
