@@ -139,7 +139,7 @@ p("Business Information student")
                                        tabPanel('Overview', 
                                                 {DT::DTOutput('summarytable')},
                                                 br(),
-                                       {DT:DTOutput('demotable')}),
+                                       {DT::DTOutput('demotable')}),
                                        tabPanel('Chart',
                                                 {plotOutput('hist')})
                                      ))))
