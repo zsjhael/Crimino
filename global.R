@@ -10,6 +10,8 @@ library(ggplot2)
 library(ggthemes)
 library(threejs)
 library(bslib)
+library(shinydashboard)
+library(shinyjs)
 
 #rsconnect::setAccountInfo(name='crimino', token='189602F95F6264E8E5E9AF9DFD5DE1D8', secret='Usyjx5HUgHab5yHNx5zJkeDiyiEvB4ti8TuLyTiY')
 #deployApp(appName = "Crimino")
@@ -28,8 +30,7 @@ l.Type.Highlight <- c(unique(dt.crimes.map$Type.Highlight))
 # Save palette for crime types color coding
 l.colors <- c("red", "navy", "green", "yellow", "turquoise", "tan", "orange", 
               "purple", "darkslategrey", "steelblue", "pink")
-pal <- colorFactor(l.colors, domain = dt.crimes.map$Type.Highlight)
+pal <- colorFactor(l.colors, domain = l.Type.Highlight)
 
-# T
-
-
+l.variables <- colnames(dt.ward[, -c(1)])
+l.primary.types <- dt.regression.est$Primary.Type
