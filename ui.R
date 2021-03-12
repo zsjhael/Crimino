@@ -48,7 +48,7 @@ p("BIM student"),
 br(),
 br(),
 br(),
-p("Maria Pelos Melo"),
+p("Maria Peres de Melo"),
 p("BIM student"),
 br(),
 br(),
@@ -58,19 +58,46 @@ p("BIM student"))
                           
                         ))))),
            ),
+           
            tabPanel("Data Explorer",
                          h1("Data Explorer"),
                     br(),
                     p("Have you ever wondered what the most recurring crime type was in a specific location or specific point in time? Data Explorer allows you to check crime statistics for your ward in the desired date range."),
                     fluidPage(
                       tabsetPanel(
-                        tabPanel("Explore the Dataset", 
+                      tabPanel(
+                                 titlePanel("The Crimino Dataset"),
+                                 sidebarPanel(
+                                            h4("Find out more about the dataset behind Crimino"),
+                                            
+                                            p("The top table at the right describes the 23 variables that were collected for each observation in the Crimino dataset."),
+          
+                                            p("Additionally,the bottom table displays a sample of 100 random observations from the dataset."),
+      
+                                            p("All our data was obtained from the Chicago Data Portal, the City of Chicago's open data platform. The link to the portal's website can be found below."),
+      
+                                            a(href = "https://data.cityofchicago.org", "Chicago Data Portal")
+                                            
+                                 ),
+                                 
+                                 mainPanel(
+                                            h3("Variables Description"),
+                                            DT::DTOutput("variables"),
+                                            br(),
+                                            hr(),
+  
+                                            h3("Dataset Sample"),
+                                            DT::DTOutput("sample")
+                                 )
+                                 ),  
+                      tabPanel("Explore the Dataset", 
                                  fluidPage (
                                    titlePanel("Data Explorer Descriptives"),
                                    
                                    sidebarLayout(
                                      
                                      sidebarPanel(
+                                                h4("Explore the Crimino Dataset"),
                                                 p("Here you can find overall descriptives on the crime in Chicago in 2017. There are in total 254 different types of crimes happening accross 50 wards. 
                                                        In total, there are around 30.000 crime cases in more that 28.000 different specific locations"),
                                               br(),
@@ -79,11 +106,14 @@ p("BIM student"))
                                      
                                      mainPanel (
                                        tabsetPanel(
-                                         tabPanel("Wards", plotOutput("hist.ward")),
-                                         tabPanel("Crimes", plotOutput("hist.Primary.Type")),
-                                         tabPanel("Crime Descriptions", plotOutput("hist.Description"))
+                                         tabPanel("Wards", h3("Frequency of Crimes per Ward"),plotOutput("hist.ward")),
+                                         tabPanel("Crime Types",h3("Frequency of Crime Types"), plotOutput("hist.Primary.Type")),
+                                         tabPanel("Top 10 Crimes", h3("Top 10 Crimes - Daily and Hourly Occurrence"), tableOutput("df.top.10.crimes"))
                                        ),
-                                       tableOutput("tb.locations")
+                                      
+                                        hr(),
+                                         h3("Data descriptives per type of Location"),
+                                         tableOutput("tb.locations"),
                                      )
                                    )
                                  )
@@ -219,7 +249,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    through the networ analytic analysis and how 
                                    this analysis will be used to predict crime 
                                    occurence on the next page."),
+
                                  hr(),
+
+                                 br(),
+
                                  h3("1. Approach"),
                                  p("In order to predict the overall occurrence of
                                    different crime types by each Chicago Ward,
@@ -244,8 +278,12 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                  p("A schematic overview of our multilayered network 
                                    is given below. The network is based weighted 
                                    Crime Type--Ward network and extended by:"),
+
                                  tags$ol(
                                    tags$li(strong("Ward demographics.")," Information on demographics 
+
+                                 p("1. Ward demographics. Information on demographics 
+
                                    by ward from the US Census, more specifically, 
                                    the distribution of Race ('% White', '% Black' 
                                    & '% Asian'), the percentage of people with 
@@ -253,7 +291,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    of each working inhabitant. This is not specfically 
                                    network data and will therefore not show up in 
                                    the visualisation."),
+
                                    tags$li(strong("311 Service Call Requests."), " The number of 
+
+                                 p("2. 311 Service Call Requests. The number of 
+
                                    requests made to the municipality on the following 
                                    topics: notifications of Abandoned Vehicles, 
                                    requests for new Garbage Carts for household waste, 
@@ -264,7 +306,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    have its own node and the edge with Ward will be 
                                    weighted based on the number of requests made within 
                                    the boudaries of that ward."),
+
                                    tags$li(strong("Police Stations."), " In Chicago, police stations 
+
+                                 p("3. Police Stations. In Chicago, police stations 
+
                                    are assigned to police districts, so that almost 
                                    all districs have one police station in them. 
                                    However, Wards do not fit within certain police 
@@ -276,7 +322,11 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    to the same stations. We will include the number 
                                    of edges (number of connected stations) in the 
                                    regression analysis."),
+
                                    tags$li(strong("Geographic Neigbors."), " Wards are connected to 
+
+                                 p("4. Geographic Neigbors. Wards are connected to 
+
                                    each other if they share a geographic border. 
                                    In order to include the influence of a broader 
                                    area around the Ward on the occurrence of crimes, 
@@ -290,6 +340,7 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    in the regression. Thus, each variable will occur 
                                    twice, once for the Ward in question and once as 
                                    the average of the neighbors of the Ward in question."),
+
                                  ),
                                  p("Now, based on this network data we will run 
                                    a linear regression, which will be futher elaborated 
@@ -366,6 +417,30 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                  hr(),
                                  h3("2. Adjust Inputs"),
                                  p("Adjust the inputs for your ward."),
+
+                                 p("Now, ... bla bla bla"),
+                                 p("[INCLUDE SCHEMATIC OVERVIEW], [INCLUDE NETWORK VISUALISATION]"),
+                                 br(),
+                                 h3("3. Regression Analysis"),
+                                 p("yo yo"),
+                        ),
+                        tabPanel("Crime Prediction",
+                                 titlePanel("Predicting Spatio Crime Occurrence"),
+                                 br(),
+                                 p("Through our predictive analysis of the crime dataset you can receive information about whether a certain crime station is likely to happen in a specific ward given that two wards are connected."),
+                                 br(),
+                                 useShinyjs(),
+                                 h3("1. Choose Default Ward Values"),
+                                 fluidRow(
+                                   box(
+                                     width = 4, solidHeader = TRUE, status = "primary",
+                                     p("Choose a Ward you would like to optimize. You can edit the individual Ward characteristics below, but note that the average neigbor values of this ward will be taken into account for calculating the predicted crimes."),
+                                     sliderInput(inputId = 'ward.input', label = 'Select original ward', min = 1, max = 50, value = 24),
+                                   ),
+                                 ),
+                                 br(),
+                                 h3("2. Adjust Inputs"),
+
                                  fluidRow(
                                    shinydashboard::box(
                                      title = "Demographics", width = 4, solidHeader = TRUE, status = "primary",
@@ -384,6 +459,7 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                      uiOutput("police.input"),
                                    ),
                                  ),
+
                                  hr(),
                                  h3("Prediction of number of crimes"),
                                  p("The table below will show the predicted crime 
@@ -397,6 +473,10 @@ Thus, the more central in the network a crime OR location is, the closer it is t
                                    will not occur, it should be fine to show them 
                                    as zero for this exercise"),
                                  DT::DTOutput('predictions')
+
+                                 h3("Prediction of number of crimes"),
+                                 tableOutput("predictions")
+
                         )
                       )
                     )
