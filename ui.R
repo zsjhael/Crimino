@@ -57,13 +57,39 @@ p("BIM student"))
                           
                         ))))),
            ),
+           
            tabPanel("Data Explorer",
                          h1("Data Explorer"),
                     br(),
                     p("Have you ever wondered what the most recurring crime type was in a specific location or specific point in time? Data Explorer allows you to check crime statistics for your ward in the desired date range."),
                     fluidPage(
                       tabsetPanel(
-                        tabPanel("Explore the Dataset", 
+                      tabPanel(
+                                 titlePanel("The Crimino Dataset"),
+                                 sidebarPanel(
+                                            h4("Find out more about the dataset behind Crimino"),
+                                            
+                                            p("The top table at the right describes the 23 variables that were collected for each observation in the Crimino dataset."),
+          
+                                            p("Additionally,the bottom table displays a sample of 100 random observations from the dataset."),
+      
+                                            p("All our data was obtained from the Chicago Data Portal, the City of Chicago's open data platform. The link to the portal's website can be found below."),
+      
+                                            a(href = "https://data.cityofchicago.org", "Chicago Data Portal")
+                                            
+                                 ),
+                                 
+                                 mainPanel(
+                                            h3("Variables Description"),
+                                            DT::DTOutput("variables"),
+                                            br(),
+                                            hr(),
+  
+                                            h3("Dataset Sample"),
+                                            DT::DTOutput("sample")
+                                 )
+                                 ),  
+                      tabPanel("Explore the Dataset", 
                                  fluidPage (
                                    titlePanel("Data Explorer Descriptives"),
                                    
