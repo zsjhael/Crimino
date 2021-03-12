@@ -1,18 +1,50 @@
 function(input, output, session) {
   theme_set(theme_classic() + theme(text=element_text(family="Raleway")))
   
+  # ---- Reactive Inputs ----
+  output$race.white.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Race.White_pct', label = 'Percentage "White"', min = 0, max = 1, value = dt.ward[dt.ward$Ward == input$ward.input, "Race.White_pct"])
+    )
+  })
+  output$race.black.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Race.Black_pct', label = 'Percentage "Black"', min = 0, max = 1, value = dt.ward[dt.ward$Ward == input$ward.input, "Race.Black_pct"])
+    )
+  })
+  output$race.asian.input <- renderUI({
+    tagList(
+      shinyjs::disabled(sliderInput(inputId = 'Race.Asian_pct', label = 'Percentage "Asian"', min = 0, max = 1, value = (1 - input$Race.White_pct - input$Race.Black_pct)))
+    )
+  })
+  output$ethnicity.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Ethnicity.Hispanic_pct', label = 'Percentage "Hispanic Ethnicity"', min = 0, max = 1, value = dt.ward[dt.ward$Ward == input$ward.input, "Ethnicity.Hispanic_pct"])
+    )
+  })
+  output$police.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Police_Stations', label = 'Number of Police Stations in a Ward', min = min(dt.ward$Police_Stations), max = max(dt.ward$Police_Stations), value = dt.ward[dt.ward$Ward == input$ward.input, "Police_Stations"])
+    )
+  })
+  output$income.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Income', label = 'Average Income Level', min = min(dt.ward$Income), max = max(dt.ward$Income), value = dt.ward[dt.ward$Ward == input$ward.input, "Income"])
+    )
+  })
+  output$service.calls.input <- renderUI({
+    tagList(
+      sliderInput(inputId = 'Abandoned_Vehicles', label = 'Number of Abandonded Vehicle Requests', min = min(dt.ward$Abandoned_Vehicles), max = max(dt.ward$Abandoned_Vehicles), value = dt.ward[dt.ward$Ward == input$ward.input, "Abandoned_Vehicles"]),
+      sliderInput(inputId = 'Garbage_Carts', label = 'Number of Garbage Cart Requests', min = min(dt.ward$Garbage_Carts), max = max(dt.ward$Garbage_Carts), value = dt.ward[dt.ward$Ward == input$ward.input, "Garbage_Carts"]),
+      sliderInput(inputId = 'Rodent_Baiting', label = 'Number of Rodent Baiting Requests', min = min(dt.ward$Rodent_Baiting), max = max(dt.ward$Rodent_Baiting), value = dt.ward[dt.ward$Ward == input$ward.input, "Rodent_Baiting"]),
+      sliderInput(inputId = 'Sanitation_Code_Complaints', label = 'Number of Sanitation Code Complaints', min = min(dt.ward$Sanitation_Code_Complaints), max = max(dt.ward$Sanitation_Code_Complaints), value = dt.ward[dt.ward$Ward == input$ward.input, "Sanitation_Code_Complaints"]),
+      sliderInput(inputId = 'Graffiti_Removal', label = 'Number of Gaffiti Removal Requests', min = min(dt.ward$Graffiti_Removal), max = max(dt.ward$Graffiti_Removal), value = dt.ward[dt.ward$Ward == input$ward.input, "Graffiti_Removal"]),
+      sliderInput(inputId = 'Abandoned_Buildings', label = 'Number of Abandonded Building Requests', min = min(dt.ward$Abandoned_Buildings), max = max(dt.ward$Abandoned_Buildings), value = dt.ward[dt.ward$Ward == input$ward.input, "Abandoned_Buildings"])
+    )
+  })
+  
+  
   # ---- Data Explorer ----
-  # -- About the Crimino Dataset Tab--
-  output$variables <- DT:: renderDT({
-    dt.variables
-  })
-
-  output$sample <- DT:: renderDT({
-    dt.crimes %>% 
-      dplyr::sample_n(100)
-  })
-  
-  
   # -- Summary Statistics Tab
   output$tb.descriptives <- renderTable({
     dt.descriptives <- data.frame(Category = c("Total nº of observations", "Unique crime types", "Unique crime groups - Primary.Type", "Total nº unique locations", "Arrests"), Statistics = c(nrow(dt.crimes), length(unique(dt.crimes$Description)), length(unique(dt.crimes$Primary.Type)), length(unique(dt.crimes$Location)), nrow(dt.crimes[Arrest == "Yes", ])))
@@ -330,4 +362,107 @@ function(input, output, session) {
   output$centralitysummary <- renderTable({
     graphCentralities()
   })
+  
+  # ---- Advanced Analytics ----
+  
+  output$regression.data <- DT::renderDT({
+    dt.regression.data <- round(dt.ward, 2)
+    DT::datatable(
+      dt.regression.data,
+      filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+      options = list(#scrollY = 650,
+                     scrollX = 500,
+                     deferRender = TRUE,
+                     scroller = TRUE,
+                     paging = TRUE,
+                     pageLength = 10,
+                     buttons = list('excel',
+                                    list(extend = 'colvis', targets = 0, visible = FALSE)),
+                     dom = 'lBfrtip',
+                     fixedColumns = list(leftColumns = 1)), 
+      rownames = FALSE)
+  })
+  
+  output$regression.coefficients <- DT::renderDT({
+    dt.regression.coefficients <- dt.regression.est
+    dt.regression.coefficients <- dt.regression.coefficients %>% mutate_if(is.numeric, round, digits = 2)
+    DT::datatable(
+      dt.regression.coefficients,
+      filter = 'top', extensions = c('Buttons', 'FixedColumns'),
+      options = list(#scrollY = 650,
+                     scrollX = 500,
+                     deferRender = TRUE,
+                     scroller = TRUE,
+                     paging = TRUE,
+                     pageLength = 10,
+                     buttons = list('excel',
+                                    list(extend = 'colvis', targets = 0, visible = FALSE)),
+                     dom = 'lBfrtip',
+                     fixedColumns = list(leftColumns = 1)), 
+      rownames = FALSE)
+  })
+  
+  predictions <- reactive({
+    dt.output.prediction <- data.table(matrix(ncol = 2, nrow = 1))
+    colnames(dt.output.prediction) <- c("Primary.Type", "Prediction")
+    dt.all.predictions <- data.table(matrix(ncol = 2, nrow = 0))
+    colnames(dt.all.predictions) <- c("Primary.Type", "Prediction")
+    
+    dt.manual.predictions <- c(input$Race.White_pct, 
+                               input$Race.Black_pct, 
+                               input$Race.Asian_pct,
+                               input$Ethnicity.Hispanic_pct,
+                               input$Income,
+                               input$Abandoned_Vehicles,
+                               input$Garbage_Carts,
+                               input$Rodent_Baiting,
+                               input$Sanitation_Code_Complaints,
+                               input$Graffiti_Removal,
+                               input$Abandoned_Buildings,
+                               input$Police_Stations,
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Race.White_pct"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Race.Black_pct"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Race.Asian_pct"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Ethnicity.Hispanic_pct"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Income"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Abandoned_Vehicles"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Garbage_Carts"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Rodent_Baiting"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Sanitation_Code_Complaints"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Graffiti_Removal"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Abandoned_Buildings"],
+                               dt.ward[dt.ward$Ward == input$ward.input, "neig_Police_Stations"]
+    )
+    
+    names(dt.manual.predictions) <- c(l.variables)
+    
+    for (ptype in l.primary.types) {
+      predictor.values <- data.table(matrix(ncol = 0, nrow = 1))
+      for (variables in l.variables) {
+        value <- unname(dt.manual.predictions[variables])
+        predictor.values <- cbind(predictor.values, value)
+      }
+      
+      colnames(predictor.values) <- c(l.variables)
+      
+      prediction <- as.matrix(dt.regression.est[Primary.Type == ptype, ][, -c(1:2)]) * as.matrix(predictor.values)
+      prediction <- sum(prediction) + dt.regression.est[Primary.Type == ptype, ]$Intercept
+      
+      if(round(prediction, 0) < 0) {
+        dt.output.prediction$Primary.Type[1] <- ptype
+        dt.output.prediction$Prediction[1] <- 0
+        dt.all.predictions <- rbind(dt.all.predictions, dt.output.prediction)
+      } else {
+        dt.output.prediction$Primary.Type[1] <- ptype
+        dt.output.prediction$Prediction[1] <- round(prediction, 0)
+        dt.all.predictions <- rbind(dt.all.predictions, dt.output.prediction)
+      }
+    }
+    dt.all.predictions
+  })
+  
+  output$predictions <- DT::renderDT({
+    predictions()
+  })  
+  
 }
